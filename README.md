@@ -1,0 +1,70 @@
+# make_my_setlist
+
+Scans a folder of sheet music PDFs and copies the relevant parts (piano or bass) into a new dated folder.
+
+## First-time setup on macOS
+
+### 1. Make the binary executable
+
+Open Terminal, navigate to the folder containing the binary, and run:
+
+```bash
+chmod +x make_my_setlist
+```
+
+### 2. Allow macOS to run it (Gatekeeper)
+
+macOS blocks unsigned binaries downloaded from the internet. Choose one of the following methods:
+
+**Option A — Terminal (fastest):**
+
+```bash
+xattr -d com.apple.quarantine ./make_my_setlist
+```
+
+**Option B — Finder:**
+
+1. Right-click the binary in Finder
+2. Select **Open**
+3. Click **Open** in the dialog that appears
+
+**Option C — System Settings:**
+
+1. Try running the binary once — macOS will block it and show a notification
+2. Open **System Settings → Privacy & Security**
+3. Scroll down to the security section where the blocked app is listed
+4. Click **Allow Anyway**
+5. Run the binary again and click **Open**
+
+## Usage
+
+```
+./make_my_setlist [-piano|-bass] [-target <output_folder>] <absolute_input_folder_path>
+```
+
+### Flags
+
+| Flag | Required | Description |
+|------|----------|-------------|
+| `-piano` | Yes (one of) | Copy PDFs matching piano keywords |
+| `-bass` | Yes (one of) | Copy PDFs matching bass keywords |
+| `-target` | No | Output folder path. Defaults to Desktop |
+
+### Examples
+
+Copy piano parts, output to Desktop:
+```bash
+./make_my_setlist -piano /Users/you/Music/Setlist
+```
+
+Copy bass parts, output to a custom folder:
+```bash
+./make_my_setlist -bass -target /Users/you/Documents/Output /Users/you/Music/Setlist
+```
+
+
+## Output
+
+A new folder named `<input_folder_name>_<YYYY-MM-DD>` is created in the output location containing the matched PDFs, each prefixed with its parent folder name.
+
+*Note: On Mac os instead of typing folder names which can be tricky you can drag and drop the folder from finder into terminal window and the path is automatically inputed*
