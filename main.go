@@ -44,7 +44,7 @@ func main() {
 	flag.Parse()
 
 	if flag.NArg() < 1 {
-		fmt.Println("Usage: go run main.go [-piano|-bass] <absolute_folder_path>")
+		fmt.Println("Usage: go run main.go (-piano|-bass) [-target <absolute_folder_to_copy_new_pdfs>] <absolute_folder_path>")
 		return
 	}
 
