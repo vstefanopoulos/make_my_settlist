@@ -1,6 +1,6 @@
 # make_my_setlist
 
-Scans a folder of sheet music PDFs and copies the relevant parts (piano or bass) into a new dated folder.
+Scans a folder of sheet music PDFs and copies the relevant parts (piano, bass, guitar, alto & tenor sax, trombone) into a new dated folder.
 
 ## Run with pipeline from github (for online usage)
 
@@ -79,6 +79,10 @@ make_setlist -piano
 |------|----------|-------------|
 | `-piano` | Yes (one of) | Copy PDFs matching piano keywords |
 | `-bass` | Yes (one of) | Copy PDFs matching bass keywords |
+| `-guitar` | Yes (one of) | Copy PDFs matching bass keywords |
+| `-alto` | Yes (one of) | Copy PDFs matching bass keywords |
+| `-tenor` | Yes (one of) | Copy PDFs matching bass keywords |
+| `-trombone` | Yes (one of) | Copy PDFs matching bass keywords |
 | `-target` | No | Output folder path. Defaults to Desktop |
 
 ### Examples
