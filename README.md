@@ -15,7 +15,7 @@ curl -fsSL https://raw.githubusercontent.com/vstefanopoulos/make_my_settlist/ref
 
 ### 1. Download the script
 
-Download the `make_my_setlist.sh` file from `https://github.com/vstefanopoulos/make_my_settlist/blob/main/make_my_setlist.sh`
+Download the `make_my_setlist.sh` file from `https://github.com/vstefanopoulos/make_my_settlist/blob/main/make_my_setlist.sh` and place it at a folder of your choice.
 
 ### 2. Make the binary executable
 
@@ -48,6 +48,24 @@ xattr -d com.apple.quarantine ./make_my_setlist
 3. Scroll down to the security section where the blocked app is listed
 4. Click **Allow Anyway**
 5. Run the binary again and click **Open**
+
+### 4. Optionally add a shortcut to the script
+
+- Add these lines to the end of `~/.zshrc`
+```bash
+# make_my_setlist shortcut                                                                                                              
+make_setlist() {                                                                                                                        
+    bash "/Users/yourname/folder/to/script/make_my_setlist.sh" "$@"                           
+}
+```
+- Run
+```bash
+source ~/.zshrc
+```
+After that you should be able to run the script from any directory like:
+```bash
+make_setlist -piano
+```
 
 ## Usage
 

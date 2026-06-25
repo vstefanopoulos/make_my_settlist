@@ -4,9 +4,13 @@ set -euo pipefail
 # Keywords
 PIANO_KEYWORDS=("Piano" "Lead sheet" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
 BASS_KEYWORDS=("bass guitar" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
+GUITAR_KEYWORDS=("guitar" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
+ALTO_KEYWORDS=("alto" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
+TENOR_KEYWORDS=("tenor" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
+TROMBONE_KEYWORDS=("trombone" "bone" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
 
 usage() {
-    echo "Usage: $(basename "$0") (-piano|-bass) [-target <absolute_folder_to_copy_new_pdfs>] [absolute_folder_path]"
+    echo "Usage: $(basename "$0") (-piano|-bass|-guitar|-alto|-tenor|-trombone) [-target <absolute_folder_to_copy_new_pdfs>] [absolute_folder_path]"
     echo "       If no folder path is given, the current working directory is used."
     exit 1
 }
@@ -14,12 +18,20 @@ usage() {
 # Parse flags
 use_piano=false
 use_bass=false
+use_guitar=false
+use_alto=false
+use_tenor=false
+use_trombone=false
 target_dir=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -piano) use_piano=true; shift ;;
-        -bass)  use_bass=true;  shift ;;
+        -piano)    use_piano=true;    shift ;;
+        -bass)     use_bass=true;     shift ;;
+        -guitar)   use_guitar=true;   shift ;;
+        -alto)     use_alto=true;     shift ;;
+        -tenor)    use_tenor=true;    shift ;;
+        -trombone) use_trombone=true; shift ;;
         -target)
             if [[ -z "${2:-}" ]]; then echo "Error: -target requires an argument."; exit 1; fi
             target_dir="$2"; shift 2 ;;
@@ -28,19 +40,35 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if ! $use_piano && ! $use_bass; then
-    echo "Error: specify either -piano or -bass flag."
+instrument_count=0
+$use_piano    && ((instrument_count++)) || true
+$use_bass     && ((instrument_count++)) || true
+$use_guitar   && ((instrument_count++)) || true
+$use_alto     && ((instrument_count++)) || true
+$use_tenor    && ((instrument_count++)) || true
+$use_trombone && ((instrument_count++)) || true
+
+if [[ $instrument_count -eq 0 ]]; then
+    echo "Error: specify one of -piano, -bass, -guitar, -alto, -tenor, or -trombone."
     exit 1
 fi
-if $use_piano && $use_bass; then
-    echo "Error: specify only one of -piano or -bass."
+if [[ $instrument_count -gt 1 ]]; then
+    echo "Error: specify only one instrument flag."
     exit 1
 fi
 
 if $use_piano; then
     keywords=("${PIANO_KEYWORDS[@]}")
-else
+elif $use_bass; then
     keywords=("${BASS_KEYWORDS[@]}")
+elif $use_guitar; then
+    keywords=("${GUITAR_KEYWORDS[@]}")
+elif $use_alto; then
+    keywords=("${ALTO_KEYWORDS[@]}")
+elif $use_tenor; then
+    keywords=("${TENOR_KEYWORDS[@]}")
+else
+    keywords=("${TROMBONE_KEYWORDS[@]}")
 fi
 
 input_path="${1:-$PWD}"
