@@ -2,9 +2,22 @@
 
 Scans a folder of sheet music PDFs and copies the relevant parts (piano or bass) into a new dated folder.
 
-## First-time setup on macOS
+## Run with pipeline from github (for online usage)
 
-### 1. Make the binary executable
+1) Make sure you are connected to the internet
+2) Right click on the folder you want to extract pdfs from and choose `New Terminal at Folder`
+3) On the new terminal window copy paste the command and press enter
+```bash
+curl -fsSL https://raw.githubusercontent.com/vstefanopoulos/make_my_settlist/refs/heads/main/make_my_setlist.sh | bash -s -- -bass
+```
+
+## First-time setup on macOS (for offline usage)
+
+### 1. Download the script
+
+Download the `make_my_setlist.sh` file from `https://github.com/vstefanopoulos/make_my_settlist/blob/main/make_my_setlist.sh`
+
+### 2. Make the binary executable
 
 Open Terminal, navigate to the folder containing the binary, and run:
 
@@ -12,7 +25,7 @@ Open Terminal, navigate to the folder containing the binary, and run:
 chmod +x make_my_setlist
 ```
 
-### 2. Allow macOS to run it (Gatekeeper)
+### 3. Allow macOS to run it (Gatekeeper)
 
 macOS blocks unsigned binaries downloaded from the internet. Choose one of the following methods:
 
@@ -39,7 +52,7 @@ xattr -d com.apple.quarantine ./make_my_setlist
 ## Usage
 
 ```
-./make_my_setlist [-piano|-bass] [-target <output_folder>] <absolute_input_folder_path>
+./make_my_setlist.sh [-piano|-bass] [-target <output_folder>] [<absolute_input_folder_path>]
 ```
 
 ### Flags
@@ -54,12 +67,12 @@ xattr -d com.apple.quarantine ./make_my_setlist
 
 Copy piano parts, output to Desktop:
 ```bash
-./make_my_setlist -piano /Users/you/Music/Setlist
+./make_my_setlist.sh -piano /Users/you/Music/Setlist
 ```
 
 Copy bass parts, output to a custom folder:
 ```bash
-./make_my_setlist -bass -target /Users/you/Documents/Output /Users/you/Music/Setlist
+./make_my_setlist.sh -bass -target /Users/you/Documents/Output /Users/you/Music/Setlist
 ```
 
 
