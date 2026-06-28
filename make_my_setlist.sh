@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+PDFMERGE_URL="https://github.com/vstefanopoulos/make_my_settlist/releases/latest/download/pdfmerge"
+
 # Keywords
 PIANO_KEYWORDS=("Piano" "Lead sheet" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
 BASS_KEYWORDS=("bass guitar" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
@@ -10,8 +12,9 @@ TENOR_KEYWORDS=("tenor" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert
 TROMBONE_KEYWORDS=("trombone" "bone" "lead sheet" "piano" "Keyboard" "Organ" "Orgel" "Concert" "Piano Muse" "Keys" "Full Score")
 
 usage() {
-    echo "Usage: $(basename "$0") (-piano|-bass|-guitar|-alto|-tenor|-trombone) [-target <absolute_folder_to_copy_new_pdfs>] [absolute_folder_path]"
+    echo "Usage: $(basename "$0") (-piano|-bass|-guitar|-alto|-tenor|-trombone) [-target <absolute_folder_to_copy_new_pdfs>] [-concat] [absolute_folder_path]"
     echo "       If no folder path is given, the current working directory is used."
+    echo "       -concat  merge all collected PDFs into a single PDF using macOS PDFKit"
     exit 1
 }
 
@@ -22,6 +25,7 @@ use_guitar=false
 use_alto=false
 use_tenor=false
 use_trombone=false
+use_concat=false
 target_dir=""
 
 while [[ $# -gt 0 ]]; do
@@ -32,6 +36,7 @@ while [[ $# -gt 0 ]]; do
         -alto)     use_alto=true;     shift ;;
         -tenor)    use_tenor=true;    shift ;;
         -trombone) use_trombone=true; shift ;;
+        -concat)   use_concat=true;   shift ;;
         -target)
             if [[ -z "${2:-}" ]]; then echo "Error: -target requires an argument."; exit 1; fi
             target_dir="$2"; shift 2 ;;
@@ -150,7 +155,46 @@ copy_matching_pdfs() {
         fi
     done < <(list_pdfs "$folder_path")
 
+    # Last resort: if no keyword match, look for a PDF whose base name is contained in the folder name
+    if ! $found; then
+        local folder_lower
+        folder_lower="$(echo "$prefix" | tr '[:upper:]' '[:lower:]')"
+        while IFS= read -r -d '' file; do
+            local name
+            name="$(basename "$file")"
+            local name_lower
+            name_lower="$(echo "${name%.*}" | tr '[:upper:]' '[:lower:]')"
+            if [[ "$folder_lower" == *"$name_lower"* ]]; then
+                cp "$file" "${out_folder}/${prefix} ${name}"
+                found=true
+                break
+            fi
+        done < <(list_pdfs "$folder_path")
+    fi
+
     $found && return 0 || return 1
+}
+
+# Downloads the pdfmerge binary from GitHub Releases, runs it, then deletes it.
+# The binary is a universal Swift/PDFKit CLI — no dependencies required on the user's machine.
+merge_pdfs() {
+    local src_dir="$1"
+    local output_pdf="$2"
+    local tmp_bin
+    tmp_bin="$(mktemp)"
+
+    echo "Downloading pdfmerge..."
+    if ! curl -fsSL "$PDFMERGE_URL" -o "$tmp_bin"; then
+        rm -f "$tmp_bin"
+        echo "Error: failed to download pdfmerge. Check your internet connection."
+        exit 1
+    fi
+
+    chmod +x "$tmp_bin"
+    xattr -d com.apple.quarantine "$tmp_bin" 2>/dev/null || true
+
+    "$tmp_bin" "$src_dir" "$output_pdf"
+    rm -f "$tmp_bin"
 }
 
 # --- Main logic ---
@@ -176,4 +220,11 @@ while IFS= read -r -d '' subfolder; do
     fi
 done < <(find "$input_path" -maxdepth 1 -mindepth 1 -type d -print0 2>/dev/null)
 
-echo "PDFs copied to: $output_folder"
+if $use_concat; then
+    merged_pdf="${base_output_dir}/${base_name}_${date_str}.pdf"
+    merge_pdfs "$output_folder" "$merged_pdf"
+    rm -rf "$output_folder"
+    echo "Merged PDF: $merged_pdf"
+else
+    echo "PDFs copied to: $output_folder"
+fi
